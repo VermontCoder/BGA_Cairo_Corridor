@@ -15,7 +15,7 @@
  *
  */
 
-let color_highlight = {'000000':'888888','ff0000':'ff8888'};
+let color_highlight = {'000000':'888888','ff0000':'ff8888','ffffff':'ffffff'};
 
 define([
     "dojo","dojo/_base/declare",
@@ -75,8 +75,8 @@ function (dojo, declare) {
                 }
 
             }
-
-            document.querySelector(':root').style.setProperty('--hover_color', '#'+color_highlight[gamedatas.current_player_color]);
+            alert(':'+gamedatas.current_player_color+':');
+            document.querySelector(':root').style.setProperty('--hover_color', '#'.concat(color_highlight[gamedatas.current_player_color]));
 
 
             this.update_scores_and_illegal_spaces(gamedatas.scores, gamedatas.illegal_spaces);

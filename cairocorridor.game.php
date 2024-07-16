@@ -185,7 +185,7 @@ class CairoCorridor extends Table
     {
         $result = array();
     
-        $current_player_id = $this->getCurrentPlayerId();   
+        $current_player_id = $this->getCurrentPlayerId();
     
         // Get information about players
         // Note: you can retrieve some extra field you added for "player" table in "dbmodel.sql" if you need it.
@@ -193,7 +193,10 @@ class CairoCorridor extends Table
         $sql = "SELECT player_id id, player_score score, player_no, player_name name, player_color color FROM player ";
         $players = $this->getCollectionFromDb( $sql );
 
-        $current_player_color = $players[$current_player_id]['color'];
+
+        //check if spectator to set current player color
+        
+        $current_player_color = (!$this->isSpectator()) ? $players[$current_player_id]['color'] : 'ffffff';
 
         // self::trace( var_dump($players) );
 
