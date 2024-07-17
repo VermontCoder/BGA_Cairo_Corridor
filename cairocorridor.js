@@ -15,7 +15,9 @@
  *
  */
 
-let color_highlight = {'000000':'888888','ff0000':'ff8888','ffffff':'ffffff'};
+var color_highlight = {'000000':'888888','ff0000':'ff8888','ffffff':'ffffff'};
+
+var last_move_space_id = null;
 
 define([
     "dojo","dojo/_base/declare",
@@ -75,11 +77,21 @@ function (dojo, declare) {
                 }
 
             }
-            alert(':'+gamedatas.current_player_color+':');
+            
             document.querySelector(':root').style.setProperty('--hover_color', '#'.concat(color_highlight[gamedatas.current_player_color]));
 
+            //highlight last move
+            if (gamedatas.last_move_space_id != null)
+            {
+                var owner_color = gamedatas.players[gamedatas.board[gamedatas.last_move_space_id].owner]["color"];
+                this.color_space(gamedatas.last_move_space_id,color_highlight[owner_color]);
+                
+                //set the global javascript variable for use
+                last_move_space_id = gamedatas.last_move_space_id;
+            }
 
             this.update_scores_and_illegal_spaces(gamedatas.scores, gamedatas.illegal_spaces);
+            
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
 
@@ -236,8 +248,13 @@ function (dojo, declare) {
 
             if( ! this.checkAction( 'claimSpace' ) )
             { return; }
+
             
             if ( this.isCurrentPlayerActive() ) {
+
+                cur_color = document.querySelector(':root').style.getPropertyValue('--hover_color');
+                this.color_space(evt.currentTarget.id, cur_color);
+
                 this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + "claimSpace.html", {
                     space_id : evt.currentTarget.id,
                     lock : true,
@@ -288,7 +305,15 @@ function (dojo, declare) {
             // }
             // this.flash_space(notif.args.space_id);
 
-            this.color_space(notif.args.space_id,notif.args.color);
+            if (last_move_space_id != null)
+            {
+                //change the previous last move color appropriately.
+                //it will be the color of the opponent's last move
+                this.color_space(last_move_space_id, notif.args.color == '000000' ? 'ff0000' : '000000')
+            }
+
+            last_move_space_id = notif.args.space_id;
+            this.color_space(notif.args.space_id,color_highlight[notif.args.color]);
             this.disconnect( $(notif.args.space_id), 'onclick');
             
             this.update_scores_and_illegal_spaces(notif.args.scores, notif.args.illegal_spaces);

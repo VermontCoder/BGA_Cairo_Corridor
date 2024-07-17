@@ -34,7 +34,9 @@ class CairoCorridor extends Table
         
         self::initGameStateLabels( array(
             "end_of_game" => 10,
-        ) );       
+        ) );
+        
+       
 	}
 	
     protected function getGameName( )
@@ -59,7 +61,9 @@ class CairoCorridor extends Table
         $default_colors = $gameinfos['player_colors'];
 
         self::setGameStateInitialValue( 'end_of_game', 0 ); //initialize end of game variable
- 
+         
+        //new way to do globals
+        $this->globals->set('last_move_space_id',null);
         // Create players
         // Note: if you added some extra field on "player" table in the database (dbmodel.sql), you can initialize it there.
         $sql = "INSERT INTO player (player_id, player_color, player_canal, player_name, player_avatar) VALUES ";
@@ -226,6 +230,8 @@ class CairoCorridor extends Table
         $result['illegal_spaces'] = $illegal_spaces;
         $result['scores'] = $scores;
         $result['current_player_color'] = $current_player_color;
+        $result['last_move_space_id'] = $this->globals->get('last_move_space_id');
+
         return $result;
     }
 
@@ -334,6 +340,9 @@ function claimSpace($space_id)
 		$this->DbQuery( $sql );
     }
 
+    //save this space so we can highlight last move on game refresh
+    $this->globals->set('last_move_space_id', $space_id);
+    
     $this->notifyAllPlayers( "claimSpace", clienttranslate( '${player_name} claims ${space_id}' ), array(
         'player_id' => $player_id,
         'player_name' => $this->getActivePlayerName(),
@@ -622,7 +631,8 @@ function stCheckEndOfGame()
 //        }
 //        // Please add your future database scheme changes here
 //
-//
+    $this->applyDbUpgradeToAllDB("CREATE TABLE IF NOT EXISTS `bga_globals` (`name` varchar(50) NOT NULL, `value` json, PRIMARY KEY (`name`)) ENGINE=InnoDB DEFAULT CHARSET=utf8");
+
     }
 ///// GAME LOGIC FUNCTIONS
 
