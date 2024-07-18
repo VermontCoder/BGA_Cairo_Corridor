@@ -32,6 +32,7 @@ function (dojo, declare) {
             // Here, you can init the global variables of your user interface
             // Example:
             // this.myGlobalValue = 0;
+            this.clientStateArgs = {};
 
         },
         
@@ -165,8 +166,28 @@ function (dojo, declare) {
             {            
                 switch( stateName )
                 {
-/*               
-                 Example:
+              
+                    case 'client_claimSpace':
+                        if (this.on_client_state && !$('button_confirm')) 
+                        {
+                            this.addActionButton('button_confirm', _('Confirm'), dojo.hitch(this, function() {
+                                this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + "claimSpace.html", {
+                                    space_id : this.clientStateArgs.space_id,
+                                    lock : true,
+                                }, this, function(result) {
+                                }, function(is_error) {
+                                });    
+                            }))
+                        }
+
+                        if (this.on_client_state && !$('button_cancel')) {
+                            this.addActionButton('button_cancel', _('Cancel'), dojo.hitch(this, function() {
+                                            this.clear_space_style(this.clientStateArgs.space_id); //must clear, not assign ffffff because that would negate hover coloring.
+                                            this.restoreServerGameState();
+                        }));
+                        }
+            break;
+             /*     Example:
  
                  case 'myGameState':
                     
@@ -255,12 +276,11 @@ function (dojo, declare) {
                 cur_color = document.querySelector(':root').style.getPropertyValue('--hover_color');
                 this.color_space(evt.currentTarget.id, cur_color);
 
-                this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + "claimSpace.html", {
-                    space_id : evt.currentTarget.id,
-                    lock : true,
-                }, this, function(result) {
-                }, function(is_error) {
-                });
+                this.clientStateArgs.space_id = evt.currentTarget.id;
+                
+                this.setClientState("client_claimSpace", {
+                        descriptionmyturn : _("${you} must confirm."),
+                    });
             }
         },
         
@@ -371,14 +391,22 @@ function (dojo, declare) {
 
         color_space(space_id, color)
         {
-            new_style = 'fill:#'+color+';cursor:default;';
+            //quick check for front #
+            color = color.charAt(0) !='#' ? '#'+color : color;
 
-            if (color == '000000')
+            new_style = 'fill:'+color+';cursor:default;';
+
+            if (color == '#000000')
             {
                 //black outline doesn't show up with black fill, change it
                 new_style += 'stroke:#666666;';
             }
             document.getElementById(space_id).setAttributeNS(null,'style',new_style);
+        },
+
+        clear_space_style(space_id)
+        {
+            document.getElementById(space_id).setAttributeNS(null,'style','');
         },
 
         highlight_space : function (space_id)
