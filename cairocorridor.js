@@ -170,14 +170,7 @@ function (dojo, declare) {
                     case 'client_claimSpace':
                         if (this.on_client_state && !$('button_confirm')) 
                         {
-                            this.addActionButton('button_confirm', _('Confirm'), dojo.hitch(this, function() {
-                                this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + "claimSpace.html", {
-                                    space_id : this.clientStateArgs.space_id,
-                                    lock : true,
-                                }, this, function(result) {
-                                }, function(is_error) {
-                                });    
-                            }))
+                            this.addActionButton('button_confirm', _('Confirm'), dojo.hitch(this, this.send_move_to_server));
                         }
 
                         if (this.on_client_state && !$('button_cancel')) {
@@ -202,6 +195,15 @@ function (dojo, declare) {
             }
         },        
 
+        send_move_to_server: function()
+        {
+            this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + "claimSpace.html", {
+                space_id : this.clientStateArgs.space_id,
+                lock : true,
+            }, this, function(result) {
+            }, function(is_error) {
+            });    
+        },
         ///////////////////////////////////////////////////
         //// Utility methods
         
@@ -278,9 +280,17 @@ function (dojo, declare) {
 
                 this.clientStateArgs.space_id = evt.currentTarget.id;
                 
-                this.setClientState("client_claimSpace", {
+                //if confirm button is active
+                if (this.getGameUserPreference(100) == 1)
+                {
+                    this.setClientState("client_claimSpace", {
                         descriptionmyturn : _("${you} must confirm."),
                     });
+                }
+                else
+                {
+                    this.send_move_to_server();
+                }
             }
         },
         
@@ -340,13 +350,6 @@ function (dojo, declare) {
 
         },
 
-        // notif_finalScore: function( notif )
-	    // {
-	    //     console.log( '**** Notification : finalScore' );
-	    //     console.log( notif );
-
-	    // },
-
         update_scores_and_illegal_spaces : function(scores, illegal_spaces)
         {
             this.handle_illegal_spaces(illegal_spaces);
@@ -404,7 +407,7 @@ function (dojo, declare) {
             document.getElementById(space_id).setAttributeNS(null,'style',new_style);
         },
 
-        clear_space_style(space_id)
+        clear_space_style: function (space_id)
         {
             document.getElementById(space_id).setAttributeNS(null,'style','');
         },
