@@ -77,6 +77,12 @@ function (dojo, declare) {
                     this.connect( $(space_id), 'onclick','onClickSpace');
                 }
 
+                //show the space ID, if user preference is yes
+                if (this.getGameUserPreference(101) == 1)
+                {
+                    this.connect( $(space_id), 'onmousemove','showSpaceID');
+                    this.connect( $(space_id), 'onmouseout','hideSpaceID');
+                }
             }
             
             document.querySelector(':root').style.setProperty('--hover_color', '#'.concat(color_highlight[gamedatas.current_player_color]));
@@ -179,7 +185,7 @@ function (dojo, declare) {
                                             this.restoreServerGameState();
                         }));
                         }
-            break;
+                    break;
              /*     Example:
  
                  case 'myGameState':
@@ -417,6 +423,19 @@ function (dojo, declare) {
             orig_style =  document.getElementById(space_id).getAttributeNS(null,'style');
             new_style = orig_style + "stroke:#106AC5;stroke-width:3px;";
             document.getElementById(space_id).setAttributeNS(null,'style',new_style);
+        },
+
+        showSpaceID: function(evt) 
+        {
+            let tooltip = document.getElementById("tooltip");
+            tooltip.innerHTML = "Space ID: " + evt.target.id;
+            tooltip.style.display = "block";
+
+        },
+          
+        hideSpaceID : function() {
+            var tooltip = document.getElementById("tooltip");
+            tooltip.style.display = "none";
         }
         // flash_space(space_id)
         // {

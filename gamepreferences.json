@@ -11,5 +11,19 @@
       }
     },
     "default": 2
+  },
+  "101": {
+      "name": "Show space ID on mouseover",
+      "needReload": true,
+      "values": {
+        "1": {
+          "name": "Yes"
+        },
+        "2": {
+          "name": "No"
+      }
+    },
+    "default": 2
   }
+
 }

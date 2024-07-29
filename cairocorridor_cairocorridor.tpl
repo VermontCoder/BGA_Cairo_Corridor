@@ -1,31 +1,8 @@
 {OVERALL_GAME_HEADER}
 
-<!-- 
---------
--- BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
--- CairoCorridor implementation : © David Felcan dfelcan@gmail.com
--- 
--- This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
--- See http://en.boardgamearena.com/#!doc/Studio for more information.
--------
-
-    cairocorridor_cairocorridor.tpl
-    
-    This is the HTML template of your game.
-    
-    Everything you are writing in this file will be displayed in the HTML page of your game user interface,
-    in the "main game zone" of the screen.
-    
-    You can use in this template:
-    _ variables, with the format {MY_VARIABLE_ELEMENT}.
-    _ HTML block, with the BEGIN/END format
-    
-    See your "view" PHP file to check how to set variables and control blocks
-    
-    Please REMOVE this comment before publishing your game on BGA
--->
-
 <DIV id="board_container">
+    
+    <div id="tooltip" style="position: absolute; display: none;"></div>
     <svg width="570" height="583.0127018922193">
         <polygon class="pentagon" id="0_0_1" points="49.99999999999999,0 86.60254037844386,0 111.60254037844386,43.30127018922193 68.30127018922192,68.30127018922192 24.999999999999996,43.30127018922193 " transform="rotate(90,24.999999999999996,43.30127018922193) translate(-18.301270189221952,-0.0)"/>
         <polygon class="pentagon" id="0_0_2" points="49.99999999999999,0 86.60254037844386,0 111.60254037844386,43.30127018922193 68.30127018922192,68.30127018922192 24.999999999999996,43.30127018922193 " transform="rotate(-90,111.60254037844386,43.30127018922193) translate(18.301270189221952,0.0)"/>

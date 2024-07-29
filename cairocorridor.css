@@ -89,6 +89,14 @@ svg polygon:hover {
     cursor: pointer;
 }
 
+#tooltip {
+    background: cornsilk;
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 5px;
+    right: 0px;
+  }
+
 
 
 
