@@ -278,7 +278,10 @@ function (dojo, declare) {
             if( ! this.checkAction( 'claimSpace' ) )
             { return; }
 
-            
+            //if we are in a confirm state do not respond to the click.
+            if ($('button_confirm'))
+            { return; }
+
             if ( this.isCurrentPlayerActive() ) {
 
                 cur_color = document.querySelector(':root').style.getPropertyValue('--hover_color');
