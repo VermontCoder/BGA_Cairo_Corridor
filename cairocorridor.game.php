@@ -328,6 +328,7 @@ function claimSpace($space_id)
     
     $players =  $this->loadPlayersBasicInfos();
 
+    
     $scores = [];
     foreach(array_keys($players) as $player_id)
     {
@@ -362,6 +363,7 @@ function claimSpace($space_id)
         foreach(array_keys($players) as $player_id)
         {
             $player_score_aux = ($player_id == $this->getActivePlayerId()) ? 0 : 1;
+            $score = $scores[$player_id]['score'];
             
             if ($score > $max_score)
             {
