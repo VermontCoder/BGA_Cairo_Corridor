@@ -367,9 +367,10 @@ function (dojo, declare) {
             {
                 // Update score on screen
                 var newScore = scores[ player_id ]['score'];
-                if (this.scoreCtrl.length >0 )
+                var scoreCtrl = this.bga.playerPanels.getScoreCounter(player_id);
+                if (scoreCtrl )
                 {
-                    this.scoreCtrl[ player_id ].toValue( newScore );
+                    scoreCtrl.toValue( newScore );
                 }
 
                 //highlight_scoring spaces
