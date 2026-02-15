@@ -52,7 +52,22 @@ function (dojo, declare) {
         setup: function( gamedatas )
         {
             //console.log( "Starting game setup" );
-            
+
+            // Load board SVG into game area
+            var boardContainer = document.createElement('div');
+            boardContainer.id = 'board_container';
+            var tooltip = document.createElement('div');
+            tooltip.id = 'tooltip';
+            tooltip.style.cssText = 'position: absolute; display: none;';
+            boardContainer.appendChild(tooltip);
+            this.bga.gameArea.getElement().appendChild(boardContainer);
+
+            var self = this;
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', g_themeurl + 'img/board.svg', false);
+            xhr.send();
+            boardContainer.insertAdjacentHTML('beforeend', xhr.responseText);
+
             // Setting up player boards
             // for( var player_id in gamedatas.players )
             // {
