@@ -70,6 +70,18 @@
       self::ajaxResponse();
   }
 
+    public function swapTile() {
+      self::setAjaxMode();
+      $this->game->swapTile();
+      self::ajaxResponse();
+  }
+
+    public function declineSwap() {
+      self::setAjaxMode();
+      $this->game->declineSwap();
+      self::ajaxResponse();
+  }
+
   }
   
 

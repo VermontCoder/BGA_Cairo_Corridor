@@ -64,6 +64,7 @@ class CairoCorridor extends Table
          
         //new way to do globals
         $this->globals->set('last_move_space_id',null);
+        $this->globals->set('swap_decided', false);
         // Create players
         // Note: if you added some extra field on "player" table in the database (dbmodel.sql), you can initialize it there.
         $sql = "INSERT INTO player (player_id, player_color, player_canal, player_name, player_avatar) VALUES ";
@@ -408,6 +409,73 @@ function claimSpace($space_id)
     // Go to next game state
     $this->gamestate->nextState( "claimSpace" );
 }
+
+function swapTile()
+{
+    $this->checkAction('swapTile');
+
+    $player_id = $this->getActivePlayerId();
+
+    // Get the single filled space
+    $sql = "SELECT space_id, owner FROM `board` WHERE owner IS NOT NULL";
+    $filled = $this->getCollectionFromDb($sql);
+    $space = array_values($filled)[0];
+    $space_id = $space['space_id'];
+
+    // Get player color
+    $sql = "SELECT player_id, player_color FROM player WHERE player_id = $player_id";
+    $player = self::getNonEmptyObjectFromDb($sql);
+
+    // Change owner to the current (swapping) player
+    $sql = "UPDATE `board` SET `owner` = $player_id WHERE space_id = '$space_id'";
+    self::DbQuery($sql);
+
+    // Recalculate board state
+    $sql = "SELECT space_id, owner FROM `board`";
+    $board = $this->getCollectionFromDb($sql);
+    $filled_array = $this->get_filled_array($board);
+    $illegal_spaces = $this->get_illegal_spaces($filled_array);
+    $score_spaces = $this->score_game($illegal_spaces, $board);
+
+    $players = $this->loadPlayersBasicInfos();
+    $scores = [];
+    foreach (array_keys($players) as $pid) {
+        $score = count($score_spaces[$pid]);
+        $scores[$pid] = array('player_id' => $pid, 'score' => $score, 'score_spaces' => $score_spaces[$pid]);
+        $sql = "UPDATE player SET player_score = $score WHERE player_id = '$pid'";
+        $this->DbQuery($sql);
+    }
+
+    // Save last move
+    $this->globals->set('last_move_space_id', $space_id);
+
+    $this->globals->set('swap_decided', true);
+
+    $this->notifyAllPlayers("swapTile", clienttranslate('${player_name} swaps the first tile'), array(
+        'player_id' => $player_id,
+        'player_name' => $this->getActivePlayerName(),
+        'color' => $player['player_color'],
+        'space_id' => $space_id,
+        'illegal_spaces' => $illegal_spaces,
+        'scores' => $scores,
+    ));
+
+    $this->gamestate->nextState("swapTile");
+}
+
+function declineSwap()
+{
+    $this->checkAction('declineSwap');
+
+    $this->globals->set('swap_decided', true);
+
+    $this->notifyAllPlayers("message", clienttranslate('${player_name} declines to swap'), array(
+        'player_name' => $this->getActivePlayerName(),
+    ));
+
+    $this->gamestate->nextState("declineSwap");
+}
+
     /*
         Each time a player is doing some game action, one of the methods below is called.
         (note: each method below must match an input method in cairocorridor.action.php)
@@ -450,22 +518,16 @@ function claimSpace($space_id)
         game state.
     */
 
-    /*
-    
-    Example for game state "MyGameState":
-    
-    function argMyGameState()
+    function argSwapDecision()
     {
-        // Get some values from the current game situation in database...
-    
-        // return values:
+        $sql = "SELECT space_id, owner FROM `board` WHERE owner IS NOT NULL";
+        $filled = $this->getCollectionFromDb($sql);
+        $space = array_values($filled)[0];
         return array(
-            'variable1' => $value1,
-            'variable2' => $value2,
-            ...
+            'swap_space_id' => $space['space_id'],
+            'swap_space_owner' => $space['owner'],
         );
-    }    
-    */
+    }
 
 //////////////////////////////////////////////////////////////////////////////
 //////////// Game state actions
@@ -475,12 +537,20 @@ function claimSpace($space_id)
 function stNextPlayer()
 {
     //self::trace( "stNextPlayer" );
-        
+
     // Go to next player
     $active_player = self::activeNextPlayer();
-    self::giveExtraTime( $active_player );    
-        
-    $this->gamestate->nextState();
+    self::giveExtraTime( $active_player );
+
+    // Check if this is the swap turn (exactly 1 space filled and swap not yet decided)
+    $sql = "SELECT COUNT(*) AS cnt FROM `board` WHERE owner IS NOT NULL";
+    $count = $this->getUniqueValueFromDB($sql);
+
+    if ($count == 1 && !$this->globals->get('swap_decided')) {
+        $this->gamestate->nextState("swapTurn");
+    } else {
+        $this->gamestate->nextState("normalTurn");
+    }
 }
 
 function stCheckEndOfGame()
@@ -577,6 +647,10 @@ function stCheckEndOfGame()
     	
         if ($state['type'] === "activeplayer") {
             switch ($statename) {
+                case 'swapDecision':
+                    // Zombie auto-declines the swap
+                    $this->gamestate->nextState( "declineSwap" );
+                    break;
                 default:
                     $this->gamestate->nextState( "zombiePass" );
                 	break;

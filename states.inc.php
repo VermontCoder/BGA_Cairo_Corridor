@@ -86,7 +86,17 @@ $machinestates = array(
         "description" => '',
         "type" => "game",
         "action" => "stNextPlayer",
-        "transitions" => array( "" => 2 )
+        "transitions" => array( "swapTurn" => 5, "normalTurn" => 2 )
+    ),
+
+    5 => array(
+        "name" => "swapDecision",
+        "description" => clienttranslate('${actplayer} must decide: Swap the first tile or play normally'),
+        "descriptionmyturn" => clienttranslate('${you} must decide: Swap the first tile or play normally'),
+        "type" => "activeplayer",
+        "possibleactions" => array( "swapTile", "declineSwap" ),
+        "args" => "argSwapDecision",
+        "transitions" => array( "swapTile" => 3, "declineSwap" => 2, "zombiePass" => 99 )
     ),
 /*
     Examples:

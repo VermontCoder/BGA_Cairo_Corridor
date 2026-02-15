@@ -118,18 +118,12 @@ function (dojo, declare) {
             
             switch( stateName )
             {
-            
-            /* Example:
-            
-            case 'myGameState':
-            
-                // Show some HTML block at this game state
-                dojo.style( 'my_html_block_id', 'display', 'block' );
-                
+            case 'swapDecision':
+                if (this.isCurrentPlayerActive() && args.args) {
+                    this.highlight_space(args.args.swap_space_id);
+                }
                 break;
-           */
-           
-           
+
             case 'dummmy':
                 break;
             }
@@ -144,21 +138,9 @@ function (dojo, declare) {
             
             switch( stateName )
             {
-            
-            /* Example:
-            
-            case 'myGameState':
-            
-                // Hide the HTML block we are displaying only during this game state
-                dojo.style( 'my_html_block_id', 'display', 'none' );
-                
-                break;
-           */
-           
-           
             case 'dummmy':
                 break;
-            }               
+            }
         }, 
 
         // onUpdateActionButtons: in this method you can manage "action buttons" that are displayed in the
@@ -173,6 +155,11 @@ function (dojo, declare) {
                 switch( stateName )
                 {
               
+                    case 'swapDecision':
+                        this.addActionButton('button_swap', _('Swap tile'), 'onSwapTile', null, false, 'red');
+                        this.addActionButton('button_decline', _('Play normally'), 'onDeclineSwap');
+                    break;
+
                     case 'client_claimSpace':
                         if (this.on_client_state && !$('button_confirm')) 
                         {
@@ -208,7 +195,23 @@ function (dojo, declare) {
                 lock : true,
             }, this, function(result) {
             }, function(is_error) {
-            });    
+            });
+        },
+
+        onSwapTile: function()
+        {
+            if (!this.checkAction('swapTile')) { return; }
+            this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + "swapTile.html", {
+                lock: true,
+            }, this, function(result) {}, function(is_error) {});
+        },
+
+        onDeclineSwap: function()
+        {
+            if (!this.checkAction('declineSwap')) { return; }
+            this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + "declineSwap.html", {
+                lock: true,
+            }, this, function(result) {}, function(is_error) {});
         },
         ///////////////////////////////////////////////////
         //// Utility methods
@@ -319,6 +322,8 @@ function (dojo, declare) {
         {
             //console.log( 'notifications subscriptions setup' );
             dojo.subscribe( 'claimSpace', this, "notif_claimSpace" );
+            dojo.subscribe( 'swapTile', this, "notif_swapTile" );
+            this.notifqueue.setSynchronous( 'swapTile', 1000 );
             //dojo.subscribe( 'finalScore', this, "notif_finalScore" );
 	        //this.notifqueue.setSynchronous( 'finalScore', 1500 );
             
@@ -357,6 +362,15 @@ function (dojo, declare) {
             
             this.update_scores_and_illegal_spaces(notif.args.scores, notif.args.illegal_spaces);
 
+        },
+
+        notif_swapTile: function(notif)
+        {
+            // Recolor the swapped space to the new owner's color
+            this.color_space(notif.args.space_id, color_highlight[notif.args.color]);
+            last_move_space_id = notif.args.space_id;
+
+            this.update_scores_and_illegal_spaces(notif.args.scores, notif.args.illegal_spaces);
         },
 
         update_scores_and_illegal_spaces : function(scores, illegal_spaces)
