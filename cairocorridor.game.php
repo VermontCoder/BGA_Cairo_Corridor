@@ -352,7 +352,7 @@ function claimSpace($space_id)
 
         foreach(array_keys($players) as $player_id)
         {
-            $player_score_aux = ($player_id == $this->getActivePlayerId()) ? 0 : 1;
+            $tiebreaker = ($player_id == $this->getActivePlayerId()) ? 0 : 1;
             $score = $scores[$player_id]['score'];
 
             if ($score > $max_score)
@@ -363,13 +363,13 @@ function claimSpace($space_id)
             else if ($score == $max_score)
             {
                 //This is a tie score. This is the the winning player if this is NOT the active player.
-                if ($player_score_aux == 1)
+                if ($tiebreaker == 1)
                 {
                     $winning_player_id = $player_id;
                 }
             }
 
-            $this->bga->playerScoreAux->set($player_id, $player_score_aux);
+            $this->bga->playerScoreAux->set($player_id, $tiebreaker);
         }
 
         // Notify final score
