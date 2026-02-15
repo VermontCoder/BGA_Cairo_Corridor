@@ -190,28 +190,19 @@ function (dojo, declare) {
 
         send_move_to_server: function()
         {
-            this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + "claimSpace.html", {
+            this.bga.actions.performAction('claimSpace', {
                 space_id : this.clientStateArgs.space_id,
-                lock : true,
-            }, this, function(result) {
-            }, function(is_error) {
             });
         },
 
         onSwapTile: function()
         {
-            if (!this.checkAction('swapTile')) { return; }
-            this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + "swapTile.html", {
-                lock: true,
-            }, this, function(result) {}, function(is_error) {});
+            this.bga.actions.performAction('swapTile');
         },
 
         onDeclineSwap: function()
         {
-            if (!this.checkAction('declineSwap')) { return; }
-            this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + "declineSwap.html", {
-                lock: true,
-            }, this, function(result) {}, function(is_error) {});
+            this.bga.actions.performAction('declineSwap');
         },
         ///////////////////////////////////////////////////
         //// Utility methods

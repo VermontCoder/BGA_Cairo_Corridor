@@ -287,7 +287,7 @@ function claimSpace($space_id)
     
     if ($board[$space_id]['owner'] != null)
     {
-        throw new BgaUserException( self::_("This space has already been played!") );
+        throw new BgaUserException( clienttranslate("This space has already been played!") );
     }
 
     //populate array with only space_ids that are filled
@@ -298,7 +298,7 @@ function claimSpace($space_id)
 
     if (!$this->is_legal_gameboard($filled_array))
     {
-        throw new BgaUserException( self::_("This move would eliminate the corridor!") );
+        throw new BgaUserException( clienttranslate("This move would eliminate the corridor!") );
     }
 
     $player_id = $this->getActivePlayerId();
