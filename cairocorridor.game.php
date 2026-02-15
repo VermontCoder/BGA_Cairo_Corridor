@@ -37,13 +37,7 @@ class CairoCorridor extends Table
         ) );
         
        
-	}
-	
-    protected function getGameName( )
-    {
-		// Used for translations and stuff. Please do not modify.
-        return "cairocorridor";
-    }	
+	}	
 
     /*
         setupNewGame:
@@ -175,6 +169,8 @@ class CairoCorridor extends Table
         $this->activeNextPlayer();
 
         /************ End of the game initialization *****/
+
+        return 2;
     }
 
     /*

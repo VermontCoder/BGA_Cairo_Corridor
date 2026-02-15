@@ -52,17 +52,6 @@
  
 $machinestates = array(
 
-    // The initial state. Please do not modify.
-    1 => array(
-        "name" => "gameSetup",
-        "description" => "",
-        "type" => "manager",
-        "action" => "stGameSetup",
-        "transitions" => array( "" => 2 )
-    ),
-    
-    // Note: ID=2 => your first state
-
     2 => array(
     		"name" => "playerTurn",
     		"description" => clienttranslate('${actplayer} must claim a pentagon'),
