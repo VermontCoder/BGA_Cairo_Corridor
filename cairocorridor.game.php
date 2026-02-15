@@ -17,10 +17,7 @@
   */
 
 
-require_once( APP_GAMEMODULE_PATH.'module/table/table.game.php' );
-
-
-class CairoCorridor extends Table
+class CairoCorridor extends Bga\GameFramework\Table
 {	
     function __construct( )
 	{
@@ -331,11 +328,7 @@ function claimSpace($space_id)
     {
         $score = count($score_spaces[$player_id]);
         $scores[$player_id] = array('player_id' => $player_id, 'score'=>$score, 'score_spaces'=>$score_spaces[$player_id]);
-        $sql = "UPDATE player
-                    SET player_score = $score
-                    WHERE player_id='$player_id'";
-            
-		$this->DbQuery( $sql );
+        $this->bga->playerScore->set($player_id, $score);
     }
 
     //save this space so we can highlight last move on game refresh
@@ -361,7 +354,7 @@ function claimSpace($space_id)
         {
             $player_score_aux = ($player_id == $this->getActivePlayerId()) ? 0 : 1;
             $score = $scores[$player_id]['score'];
-            
+
             if ($score > $max_score)
             {
                 $max_score = $score;
@@ -376,11 +369,7 @@ function claimSpace($space_id)
                 }
             }
 
-            
-            $sql = "UPDATE player
-                    SET player_score_aux = $player_score_aux
-                    WHERE player_id='$player_id'";
-            $this->DbQuery( $sql );
+            $this->bga->playerScoreAux->set($player_id, $player_score_aux);
         }
 
         // Notify final score
@@ -438,8 +427,7 @@ function swapTile()
     foreach (array_keys($players) as $pid) {
         $score = count($score_spaces[$pid]);
         $scores[$pid] = array('player_id' => $pid, 'score' => $score, 'score_spaces' => $score_spaces[$pid]);
-        $sql = "UPDATE player SET player_score = $score WHERE player_id = '$pid'";
-        $this->DbQuery($sql);
+        $this->bga->playerScore->set($pid, $score);
     }
 
     // Save last move
